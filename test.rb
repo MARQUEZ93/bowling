@@ -18,22 +18,29 @@ def running_score scores
 
     scores.each_with_index do |val, index| 
         # calculate spare frame 
-        if !calculate.empty? && scores[index].is_a?(Integer)
-            if spare 
-                results.push(10 + scores[index])
-                calculate[0] = scores[index]
-                spare = false
+        if !calculate.empty? && val.is_a?(Integer)
+            if spare
+                # calculate spare on final elemnt 
+                if calculate[-1] == "/" && index == (scores.size-1) 
+                    results.push(10 + val)
+                    results.push(nil)
+                else 
+                    results.push(10 + val)
+                    calculate[0] = val
+                    spare = false
+                end 
             # calculate spare frame
             elsif strike 
                 # calculate strike on final element
-                if calculate[-1] == 10 && index == (scores.size-1)
+                if calculate[-1] == "X" && index == (scores.size-1)
                     results.push(nil)
                     results.push(nil)
-                elsif calculate[-1] == 10
+                elsif calculate[-1] == "X"
                     calculate.push(val)
                 else
-                    results.push(10 + calculate[1] + val)
-                    results.push(calculate[1] + val)
+                    last_val = calculate[1] === "X"  ? 10 : calculate[1]
+                    results.push(10 + last_val + val)
+                    results.push(last_val + val)
                     strike = false
                     calculate = []
                 end 
@@ -45,11 +52,18 @@ def running_score scores
         # progress a spare frame
         elsif scores[index] == "/" 
             if index == scores.length - 1
+                if strike
+                    strike = false
+                    results.push(10 + 10)
+                end 
                 results.push(nil)
-            else 
-                spare = true
-                calculate.push(10-scores[index-1])
-            end
+            elsif calculate[0] == "X"
+                strike = false
+                calculate = calculate.drop(1)
+                results.push(10 + 10)
+            end 
+            calculate.push("/")
+            spare = true
         # progress a strike frame 
         elsif scores[index] == "X"
             # handle last element 
@@ -57,7 +71,7 @@ def running_score scores
                 results.push(nil)
             else 
                 strike = true
-                calculate.push(10)
+                calculate.push("X")
             end 
         # progress a regular frame
         elsif calculate.empty? && val.is_a?(Integer)
@@ -88,16 +102,16 @@ def test
     # more regular frames
     puts "([4, 5, 3, 2, 1]) test passed: #{running_score([4, 5, 3, 2, 1])  == [9, 5, nil]}"
     puts "([4, 5, 3, 2, 1, 3]) test passed: #{running_score([4, 5, 3, 2, 1, 3])  == [9, 5, 4]}"
-    
     # ongoing frames w/ either strike or spare
     puts "(['X']) test passed: #{running_score(['X'])  == [nil]}"
     puts "([3, '/']) test passed: #{running_score([3, '/'])  == [nil]}"
 
-    # puts "(['X', 2, '/']) test passed: #{running_score(['X', 2, '/'])  == [20, nil]}"
-    # puts "(['X', 2, '/', 4]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, nil]}"
-    # puts "(['X', 2, '/', 4, 3]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, 7]}"
+    # handle both strike & spare rounds
+    puts "(['X', 2, '/']) test passed: #{running_score(['X', 2, '/'])  == [20, nil]}"
+    puts "(['X', 2, '/', 4]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, nil]}"
+    puts "(['X', 2, '/', 4, 3]) test passed: #{running_score(['X', 2, '/', 4, 3])  == [20, 14, 7]}"
     
-    
+    # ongoing spare
     # puts "([3, '/']) test passed: #{running_score([3, '/'])  == [nil]}"
     # puts "([3, '/', 1]) test passed: #{running_score([3, '/', 1])  == [11, nil]}"
     # puts "([3, '/', 1, '/']) test passed: #{running_score([3, '/', 1, '/'])  == [11, nil]}"
