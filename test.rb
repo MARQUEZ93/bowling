@@ -1,6 +1,3 @@
-#!/usr/bin/ruby
-#load 'test.rb' in the irb to see changes
-
 # Spare: 10 points + the number of pins you knock down for your first attempt at the next frame.
 # Strike: score 10 points + the number of pins you knock down for the entire next frame.
 
@@ -114,7 +111,6 @@ def test
     # ongoing frames w/ either strike or spare
     puts "(['X']) test passed: #{running_score(['X'])  == [nil]}"
     puts "([3, '/']) test passed: #{running_score([3, '/'])  == [nil]}"
-
     # handle both strike & spare rounds
     puts "(['X', 2, '/']) test passed: #{running_score(['X', 2, '/'])  == [20, nil]}"
     puts "(['X', 2, '/', 4]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, nil]}"
