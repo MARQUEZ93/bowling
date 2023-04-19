@@ -1,8 +1,11 @@
 # Bowling Coding Exercise WeInfuse
 
 ## Prep
+I created & ran a container w/ a Docker Image pointing @ a Ruby image w/ IRB. I mounted my current dir into the docker container. 
 `docker run --rm -it --volume $PWD:/app dannyben/alpine-ruby ruby /app/console.rb`
+I would re-load the test.rb file to see changes
 `load test.rb`
+Run the test function to see all true statements
 `test`
 
 ## How I Solved This
