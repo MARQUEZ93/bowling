@@ -25,19 +25,40 @@ def running_score scores
                 spare = false
             # calculate spare frame
             elsif strike 
-                c = 2
+                # calculate strike on final element
+                if calculate[-1] == 10 && index == (scores.size-1)
+                    results.push(nil)
+                    results.push(nil)
+                elsif calculate[-1] == 10
+                    calculate.push(val)
+                else
+                    results.push(10 + calculate[1] + val)
+                    results.push(calculate[1] + val)
+                    strike = false
+                    calculate = []
+                end 
             # calculate regular frame
             else 
                 results.push(scores[index-1] + scores[index]) 
                 calculate = []
             end 
         # progress a spare frame
-        elsif !calculate.empty? && scores[index] == "/" 
-            spare = true
-            calculate.push(10-scores[index-1])
+        elsif scores[index] == "/" 
+            if index == scores.length - 1
+                results.push(nil)
+            else 
+                spare = true
+                calculate.push(10-scores[index-1])
+            end
         # progress a strike frame 
-        elsif !calculate.empty? && scores[index] == "X"
-            b = 3
+        elsif scores[index] == "X"
+            # handle last element 
+            if index == scores.length - 1
+                results.push(nil)
+            else 
+                strike = true
+                calculate.push(10)
+            end 
         # progress a regular frame
         elsif calculate.empty? && val.is_a?(Integer)
             # handle final element
@@ -64,12 +85,14 @@ def test
     puts "([4, 5, 'X', 8]) test passed: #{running_score([4, 5, 'X', 8])  == [9, nil, nil]}"
     # completed strike
     puts "([4, 5, 'X', 8, 1]) test passed: #{running_score([4, 5, 'X', 8, 1])  == [9, 19, 9]}"
-
-    # puts "([4, 5, 3, 2, 1]) test passed: #{running_score([4, 5, 3, 2, 1])  == [9, 5, nil]}"
-    # puts "([4, 5, 3, 2, 1, 3]) test passed: #{running_score([4, 5, 3, 2, 1, 3])  == [9, 5, 4]}"
+    # more regular frames
+    puts "([4, 5, 3, 2, 1]) test passed: #{running_score([4, 5, 3, 2, 1])  == [9, 5, nil]}"
+    puts "([4, 5, 3, 2, 1, 3]) test passed: #{running_score([4, 5, 3, 2, 1, 3])  == [9, 5, 4]}"
     
-    # puts "(['X']) test passed: #{running_score(['X'])  == [nil]}"
-    # puts "([3, '/']) test passed: #{running_score([3, '/'])  == [nil]}"
+    # ongoing frames w/ either strike or spare
+    puts "(['X']) test passed: #{running_score(['X'])  == [nil]}"
+    puts "([3, '/']) test passed: #{running_score([3, '/'])  == [nil]}"
+
     # puts "(['X', 2, '/']) test passed: #{running_score(['X', 2, '/'])  == [20, nil]}"
     # puts "(['X', 2, '/', 4]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, nil]}"
     # puts "(['X', 2, '/', 4, 3]) test passed: #{running_score(['X', 2, '/', 4])  == [20, 14, 7]}"
